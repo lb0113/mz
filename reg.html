@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<body>
+    用户名：<input id="txtUsername" type="text"><span id="userSpan"></span><br />
+    密 码：<input type="password" id="userpass"><br />
+    重复密码：<input type="password"><br />
+    性别：<input name="usersex" type="radio" value="男">男
+    <input name="usersex" type="radio" value="女" checked="checked">女
+    <br />
+    年龄：<input type="text" id="userage"><br />
+    手机号码：<input type="text" id="userphone"><br />
+    <input id="btnReg" type="button" value="注册" />
+    <div id="errorMessage" style="display: none;color:red"></div>
+</body>
+
+</html>
+<script type="text/javascript">
+    window.onload = function () {
+        $("#txtUsername").onblur = function () {
+            //1 创建对象
+            let xhr = new XMLHttpRequest();
+
+            //设置请求参数
+
+            xhr.open("get", "check02.php?username=" + this.value, true);
+
+            //回调函数
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    if (xhr.responseText == "0") {
+                        $("#userSpan").innerHTML = "亲，该用户已被使用，请换一个";
+                    } else {
+                        $("#userSpan").innerHTML = "亲，注册成功，可以使用";
+                    }
+                }
+            }
+            xhr.send();
+        }
+
+        $("#btnReg").onclick = function () {
+            let xhr = new XMLHttpRequest();
+            //设置请求参数
+            xhr.open("post", "regSave.php", true);
+
+            //回调函数
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    if (xhr.responseText == "1") {
+                        location.href = "login.html";
+                    } else {
+                        $("#errorMessage").style.display = "block";
+                        $("#errorMessage").innerHTML = "登录失败";
+                    }
+                }
+            }
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            let sexs = document.getElementsByName("usersex");
+            let sex = "女";
+            if (sexs[0].checked) {
+                sex = "男";
+            }
+            let str =
+                `username=${$("#txtUsername").value}& userpass=${$("#userpass").value}&userage=${$("#userage").value}&userphone=${$("#userphone").value}& usersex=${sex}&`;
+            xhr.send(str);
+        }
+    }
+
+    function $(str) {
+        if (str.charAt(0) == "#") {
+            return document.getElementById(str.substring(1));
+        } else if (str.charAt(0) == ".") {
+            return document.getElementsByClassName(str.substring(1));
+        } else {
+            return document.getElementsByTagName(str);
+        }
+    }
+</script>
